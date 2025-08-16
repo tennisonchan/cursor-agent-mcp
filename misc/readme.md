@@ -13,8 +13,8 @@ Why separate docs?
 - Establishes clear host (Claude) vs agent (cursor-agent) responsibilities for cost‑aware workflows.
 
 See also
-- Server entry: [mcp-cursor-agent/server.js](mcp-cursor-agent/server.js)
-- Main docs: [mcp-cursor-agent/README.md](mcp-cursor-agent/README.md)
+- Server entry: [mcp-cursor-agent/server.js](../server.js)
+- Main docs: [mcp-cursor-agent/README.md](../README.md)
 ## Multi-MCP note: Gemini CLI and cursor-agent
 
 Claude Code can use multiple MCP servers simultaneously. Besides this repo’s cursor-agent MCP, you can also integrate a Gemini CLI MCP and route tasks to either tool based on cost/scope.
