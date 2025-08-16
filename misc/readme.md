@@ -4,9 +4,9 @@ Purpose
 - This folder holds human- and agent-readable instruction files that guide how Claude Code should use the cursor-agent MCP to reduce tokens and cost.
 
 What’s inside
-- Project policy (paste into Claude’s Project Instructions): [misc/claude-project-instructions.md](misc/claude-project-instructions.md)
-- Agent policy (behavior for the MCP/tool side): [misc/cursor-agent-instructions.md](misc/cursor-agent-instructions.md)
-- Extended guide (optional, longer form): [misc/claude-agent-instructions.md](misc/claude-agent-instructions.md)
+- Project policy (paste into Claude’s Project Instructions): [claude-project-instructions.md](claude-project-instructions.md)
+- Agent policy (behavior for the MCP/tool side): [cursor-agent-instructions.md](cursor-agent-instructions.md)
+- Extended guide (optional, longer form): [claude-agent-instructions.md](claude-agent-instructions.md)
 
 Why separate docs?
 - Keeps operational guidance out of code, easy to copy/paste into Claude.
