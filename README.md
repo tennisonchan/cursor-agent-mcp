@@ -2,9 +2,9 @@
 
 Minimal, hardened Model Context Protocol (MCP) server that wraps the `cursor-agent` CLI and exposes multiple, Claude‑friendly tools for chat, repository analysis, code search, planning, and more.
 
-Core implementation: [mcp-cursor-agent/server.js](mcp-cursor-agent/server.js)
-Test harness: [mcp-cursor-agent/test_client.mjs](mcp-cursor-agent/test_client.mjs)
-Package manifest: [mcp-cursor-agent/package.json](mcp-cursor-agent/package.json)
+Core implementation: [cursor-agent-mcp/server.js](server.js)
+Test harness: [cursor-agent-mcp/test_client.mjs](test_client.mjs)
+Package manifest: [cursor-agent-mcp/package.json](package.json)
 
 
 ## Purpose: reduce token usage and cost in Claude Code
@@ -55,7 +55,7 @@ This MCP exists to offload heavy “thinking” and repo‑aware tasks from the 
 2) Install dependencies for the MCP server:
 
 ```bash
-cd ./mcp-cursor-agent
+cd ./cursor-agent-mcp
 npm ci        # or: npm install
 ```
 
@@ -72,7 +72,7 @@ cursor-agent --version
 node ./server.js
 
 # or from the repo root using the provided script
-npm --prefix ./mcp-cursor-agent run start
+npm --prefix ./cursor-agent-mcp run start
 ```
 
 ### Do I need npx?
@@ -88,18 +88,18 @@ A tiny client is provided to list tools and call one of them over stdio:
 
 ```bash
 # list tools and call chat with a prompt
-node ./mcp-cursor-agent/test_client.mjs "Hello from smoke test"
+node ./cursor-agent-mcp/test_client.mjs "Hello from smoke test"
 
 # run the raw tool with --help (no implicit --print)
-TEST_TOOL=cursor_agent_raw TEST_ARGV='["--help"]' node ./mcp-cursor-agent/test_client.mjs
+TEST_TOOL=cursor_agent_raw TEST_ARGV='["--help"]' node ./cursor-agent-mcp/test_client.mjs
 ```
 
-The client uses the same stdio transport a host would use. See [JavaScript.main()](mcp-cursor-agent/test_client.mjs:4).
+The client uses the same stdio transport a host would use. See [JavaScript.main()](test_client.mjs:4).
 
 
 ## How it works
 
-All tool calls ultimately invoke the same executor [JavaScript.invokeCursorAgent()](mcp-cursor-agent/server.js:38), which:
+All tool calls ultimately invoke the same executor [JavaScript.invokeCursorAgent()](server.js:38), which:
 
 - Resolves the `cursor-agent` executable (explicit path or PATH)
 - Injects `--print` and `--output-format <fmt>` by default
@@ -107,12 +107,12 @@ All tool calls ultimately invoke the same executor [JavaScript.invokeCursorAgent
 - Streams stdout/stderr and enforces a total timeout
 - Optionally kills long‑idle processes (disabled by default)
 
-The legacy wrapper [JavaScript.runCursorAgent()](mcp-cursor-agent/server.js:153) accepts a `prompt` and optional flags, composing the argv and delegating to the executor.
+The legacy wrapper [JavaScript.runCursorAgent()](server.js:153) accepts a `prompt` and optional flags, composing the argv and delegating to the executor.
 
 
 ## Tools
 
-These tools are registered in [JavaScript.server.tool()](mcp-cursor-agent/server.js:273) and below. All tools share the “COMMON” arguments:
+These tools are registered in [JavaScript.server.tool()](server.js:273) and below. All tools share the “COMMON” arguments:
 
 - output_format: "text" | "json" | "markdown" (default "text")
 - extra_args?: string[]
@@ -127,7 +127,7 @@ These tools are registered in [JavaScript.server.tool()](mcp-cursor-agent/server
 
 - Args: { prompt: string, ...COMMON }
 - Behavior: Single‑shot chat by passing the prompt as the final positional argument.
-- Code path: [JavaScript.server.tool()](mcp-cursor-agent/server.js:273) → [JavaScript.runCursorAgent()](mcp-cursor-agent/server.js:153)
+- Code path: [JavaScript.server.tool()](server.js:273) → [JavaScript.runCursorAgent()](server.js:153)
 
 Example:
 
@@ -143,7 +143,7 @@ Example:
 
 - Args: { file: string, instruction: string, apply?: boolean, dry_run?: boolean, prompt?: string, ...COMMON }
 - Behavior: Prompt‑based wrapper. Builds a structured instruction that asks the agent to edit or propose a patch for the file.
-- Code path: [JavaScript.server.tool()](mcp-cursor-agent/server.js:286)
+- Code path: [JavaScript.server.tool()](mserver.js:286)
 
 Example:
 
@@ -164,7 +164,7 @@ Example:
 
 - Args: { paths: string | string[], prompt?: string, ...COMMON }
 - Behavior: Prompt‑based repository/file analysis listing the paths to focus on.
-- Code path: [JavaScript.server.tool()](mcp-cursor-agent/server.js:306)
+- Code path: [JavaScript.server.tool()](server.js:306)
 
 Example:
 
@@ -183,7 +183,7 @@ Example:
 
 - Args: { query: string, include?: string | string[], exclude?: string | string[], ...COMMON }
 - Behavior: Prompt‑based code search over the repo, with optional include/exclude globs.
-- Code path: [JavaScript.server.tool()](mcp-cursor-agent/server.js:325)
+- Code path: [JavaScript.server.tool()](server.js:325)
 
 Example:
 
@@ -205,7 +205,7 @@ Example:
 
 - Args: { goal: string, constraints?: string[], ...COMMON }
 - Behavior: Prompt‑based planning tool that returns a numbered plan for your goal.
-- Code path: [JavaScript.server.tool()](mcp-cursor-agent/server.js:347)
+- Code path: [JavaScript.server.tool()](server.js:347)
 
 Example:
 
@@ -224,7 +224,7 @@ Example:
 
 - Args: { argv: string[], print?: boolean, ...COMMON }
 - Behavior: Forwards raw argv to the CLI. Defaults to print=false to avoid adding --print; set print=true to inject it.
-- Code path: [JavaScript.server.tool()](mcp-cursor-agent/server.js:369)
+- Code path: [JavaScript.server.tool()](server.js:369)
 
 Examples:
 
@@ -241,7 +241,7 @@ Examples:
 
 - Args: { prompt: string, ...COMMON }
 - Behavior: Original single‑shot chat wrapper; maintained for compatibility.
-- Code path: [JavaScript.server.tool()](mcp-cursor-agent/server.js:385)
+- Code path: [JavaScript.server.tool()](server.js:385)
 
 
 ## Configuration for MCP hosts
@@ -253,7 +253,7 @@ Example Claude Code/Claude Desktop entry:
   "mcpServers": {
     "cursor-agent": {
       "command": "node",
-      "args": ["/abs/path/to/mcp-cursor-agent/server.js"],
+      "args": ["/abs/path/to/cursor-agent-mcp/server.js"],
       "env": {
         "CURSOR_AGENT_ECHO_PROMPT": "1",
         "CURSOR_AGENT_FORCE": "true",
@@ -275,7 +275,7 @@ Add `DEBUG_CURSOR_MCP=1` to print diagnostics to stderr (spawn argv, prompt prev
   "mcpServers": {
     "cursor-agent": {
       "command": "node",
-      "args": ["/abs/path/to/mcp-cursor-agent/server.js"],
+      "args": ["/abs/path/to/cursor-agent-mcp/server.js"],
       "env": {
         "CURSOR_AGENT_ECHO_PROMPT": "1",
         "CURSOR_AGENT_FORCE": "true",
@@ -291,8 +291,8 @@ Add `DEBUG_CURSOR_MCP=1` to print diagnostics to stderr (spawn argv, prompt prev
 ```
 
 Note: many hosts don’t display server stderr logs. To see the effective prompt in the UI, use `CURSOR_AGENT_ECHO_PROMPT=1` or pass `"echo_prompt": true` in tool arguments. Implementation points:
-- debug spawn/exit logs: [JavaScript.invokeCursorAgent()](mcp-cursor-agent/server.js:73)
-- prompt preview: [JavaScript.runCursorAgent()](mcp-cursor-agent/server.js:171)
+- debug spawn/exit logs: [JavaScript.invokeCursorAgent()](server.js:73)
+- prompt preview: [JavaScript.runCursorAgent()](server.js:171)
 
 Environment variables understood by the server:
 
@@ -327,18 +327,18 @@ Environment variables understood by the server:
 ## Development
 
 - Start the server directly:
-  - `node ./mcp-cursor-agent/server.js`
+  - `node ./cursor-agent-mcp/server.js`
 - Smoke client:
-  - `node ./mcp-cursor-agent/test_client.mjs "hello"`
-  - `TEST_TOOL=cursor_agent_raw TEST_ARGV='["--help"]' node ./mcp-cursor-agent/test_client.mjs`
+  - `node ./cursor-agent-mcp/test_client.mjs "hello"`
+  - `TEST_TOOL=cursor_agent_raw TEST_ARGV='["--help"]' node ./cursor-agent-mcp/test_client.mjs`
 - Useful env while developing:
   - `DEBUG_CURSOR_MCP=1 CURSOR_AGENT_ECHO_PROMPT=1`
 
 Key entry points:
 
-- Executor: [JavaScript.invokeCursorAgent()](mcp-cursor-agent/server.js:38)
-- Legacy runner: [JavaScript.runCursorAgent()](mcp-cursor-agent/server.js:153)
-- Tool registrations start at: [JavaScript.server.tool()](mcp-cursor-agent/server.js:273)
+- Executor: [JavaScript.invokeCursorAgent()](server.js:38)
+- Legacy runner: [JavaScript.runCursorAgent()](server.js:153)
+- Tool registrations start at: [JavaScript.server.tool()](server.js:273)
 
 
 ## Security notes
@@ -350,12 +350,12 @@ Key entry points:
 
 ## Versioning
 
-Current server version: 1.1.0 (see [mcp-cursor-agent/package.json](mcp-cursor-agent/package.json))
+Current server version: 1.1.0 (see [cursor-agent-mcp/package.json](package.json))
 
 
 ## License
 
-MIT (see [mcp-cursor-agent/package.json](mcp-cursor-agent/package.json))
+MIT (see [cursor-agent-mcp/package.json](package.json))
 
 
 ## Acknowledgements
