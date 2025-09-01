@@ -237,13 +237,6 @@ Examples:
 ```
 
 
-### 7) cursor_agent_run (legacy)
-
-- Args: { prompt: string, ...COMMON }
-- Behavior: Original single‑shot chat wrapper; maintained for compatibility.
-- Code path: [JavaScript.server.tool()](server.js:385)
-
-
 ## Configuration for MCP hosts
 
 Example Claude Code/Claude Desktop entry:

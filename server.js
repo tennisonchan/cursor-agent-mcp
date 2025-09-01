@@ -8,18 +8,6 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { spawn } from 'node:child_process';
 import process from 'node:process';
 
-// Tool input schema
-const RUN_SCHEMA = z.object({
-  prompt: z.string().min(1, 'prompt is required'),
-  output_format: z.enum(['text', 'json', 'markdown']).default('text'),
-  extra_args: z.array(z.string()).optional(),
-  cwd: z.string().optional(),
-  // Optional override for the executable path if not on PATH
-  executable: z.string().optional(),
-  // Optional model and force for parity with other tools/env overrides
-  model: z.string().optional(),
-  force: z.boolean().optional(),
-});
 
 // Resolve the executable path for cursor-agent
 function resolveExecutable(explicit) {
@@ -195,7 +183,7 @@ async function runCursorAgent(input) {
 /**
 * Create MCP server and register a suite of cursor-agent tools.
 * We expose multiple verbs for better discoverability in hosts (chat/edit/analyze/search/plan),
-* plus the legacy cursor_agent_run for back-compat and a raw escape hatch.
+* plus a raw escape hatch.
 */
 const server = new McpServer(
  {
@@ -213,7 +201,6 @@ const server = new McpServer(
        '- cursor_agent_search_repo: prompt-based code search with include/exclude globs.',
        '- cursor_agent_plan_task: prompt-based planning given a goal and optional constraints.',
        '- cursor_agent_raw: pass raw argv directly to cursor-agent; set print=false to avoid implicit --print.',
-       '- cursor_agent_run: legacy single-shot chat (prompt as positional).',
      ].join(' '),
  },
 );
@@ -394,19 +381,6 @@ server.tool(
  },
 );
 
-// Legacy single-shot prompt tool retained for compatibility
-server.tool(
- 'cursor_agent_run',
- 'Run cursor-agent with a prompt and desired output format (legacy single-shot).',
- RUN_SCHEMA.shape,
- async (args) => {
-   try {
-     return await runCursorAgent(args);
-   } catch (e) {
-     return { content: [{ type: 'text', text: `Invalid params: ${e?.message || e}` }], isError: true };
-   }
- },
-);
 
 // Connect using stdio transport
 const transport = new StdioServerTransport();

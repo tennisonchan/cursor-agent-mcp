@@ -44,7 +44,6 @@ Tool Selection – Decision Flow
 - Need a plan/checklist → cursor_agent_plan_task with constraints
 - Need a targeted edit/patch → cursor_agent_edit_file with file + instruction (default to dry-run)
 - Need special CLI invocation → cursor_agent_raw (confirm with user; default print=false)
-- Legacy/compat → cursor_agent_run (prefer chat in new flows)
 
 Argument Patterns (examples)
 

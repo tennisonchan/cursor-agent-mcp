@@ -73,9 +73,6 @@ All tools accept COMMON fields: output_format ("text"|"markdown"|"json", default
   - Provide: { argv: string[], print?: boolean }
   - Use sparingly; prefer verbs above for clear intent and cheaper prompts.
 
-- cursor_agent_run (legacy)
-  - Single-shot chat; preserved for backward compatibility.
-  - Prefer cursor_agent_chat in new flows.
 
 
 ## Cost-first Patterns (Do/Don’t)

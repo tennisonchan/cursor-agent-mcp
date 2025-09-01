@@ -39,7 +39,7 @@ async function main() {
   const preferred = process.env.TEST_TOOL;
   const toolName = preferred && names.includes(preferred)
     ? preferred
-    : (names.includes('cursor_agent_chat') ? 'cursor_agent_chat' : 'cursor_agent_run');
+    : 'cursor_agent_chat';
 
   console.log('Using tool:', toolName);
 
@@ -54,14 +54,6 @@ async function main() {
       };
       break;
 
-    case 'cursor_agent_run':
-      args = {
-        prompt: process.env.TEST_PROMPT || promptDefault,
-        output_format: process.env.TEST_FORMAT || 'text',
-        extra_args: extraArgs,
-        ...(process.env.TEST_CWD ? { cwd: process.env.TEST_CWD } : {}),
-      };
-      break;
 
     case 'cursor_agent_edit_file':
       args = {
